@@ -40,6 +40,8 @@ rsync -a \
   --exclude='assets/' \
   --exclude='offscreen/' \
   --exclude='icons/source-icon.png' \
+  --exclude='privacy.html' \
+  --exclude='.nojekyll' \
   ./ "$ROOT/dist/"
 
 # Версія в manifest
@@ -88,7 +90,7 @@ done
 echo ""
 echo "━━━ Що НЕ потрапило в ZIP (навмисно) ━━━"
 echo "  • Усі *.md (документація)"
-echo "  • manifest.dev.json, docs/, assets/, offscreen/, icons/source-icon.png"
+echo "  • manifest.dev.json, docs/, assets/, offscreen/, privacy.html, .nojekyll, icons/source-icon.png"
 echo "  • scripts/, .git/, node_modules/, .env"
 echo "  • utils/logFormatter.js, utils/storageHelper.js (не підключені до розширення)"
 echo ""

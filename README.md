@@ -4,14 +4,20 @@ Chrome extension: describe a bug, optionally attach console and network context 
 
 ## Privacy
 
-- **Privacy policy (for Chrome Web Store):**  
-  With [GitHub Pages](https://docs.github.com/en/pages) enabled for this repository (source: `/docs` on `main`), the URL is:
+**Chrome Web Store URL (must open in browser as HTML, not 404):**  
+`https://andrusha52.github.io/ai-bug-reporter/privacy.html`
 
-  `https://andrusha52.github.io/ai-bug-reporter/privacy.html`
+### Увімкнути GitHub Pages (інакше лінк не працює)
 
-  Until Pages is enabled, you can use the GitHub file link for review (store prefers a normal HTTPS page once Pages is on):
+1. Репозиторій → **Settings** → **Pages**.
+2. **Build and deployment** → **Source**: *Deploy from a branch*.
+3. **Branch**: `main` → папка **`/ (root)`** → **Save**.
+4. Зачекай 1–3 хв. Перевір лінк вище — має відкритись політика.
 
-  `https://github.com/andrusha52/ai-bug-reporter/blob/main/docs/privacy.html`
+Файл для сайту лежить у **корені репо**: `privacy.html` (і порожній `.nojekyll`, щоб GitHub не ламав статику).
+
+Резерв для перегляду в GitHub:  
+`https://github.com/andrusha52/ai-bug-reporter/blob/main/privacy.html`
 
 ## Repository layout
 
