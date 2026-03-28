@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Bug Reporter - Налаштування</title>
+    <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button id="backBtn" class="icon-btn" title="Назад">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2"/>
+                </svg>
+            </button>
+            <h1>Налаштування</h1>
+            <div style="width: 36px;"></div>
+        </header>
+
+        <main>
+            <section class="settings-section">
+                <h2>📋 Що потрапляє в звіт</h2>
+                <p class="section-description">З поточної вкладки: <strong>консоль</strong> та <strong>мережа</strong> (помилки). LocalStorage і cookies у звіт <strong>не зчитуються</strong> — очистка лише через швидкі дії в popup.</p>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label for="includeScreenshot">📸 Скріншот сторінки</label>
+                        <span class="setting-hint">Опційно для UI-багів (режим Jira завжди додає скрін)</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="includeScreenshot">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </section>
+
+            <section class="settings-section">
+                <h2>⌨️ Гарячі клавіші</h2>
+                <p class="section-description">Що робить кожна комбінація. <a href="#" id="shortcutsLink">Натисни тут</a> щоб змінити клавіші. Якщо не працюють — можливо їх зайнято системою.</p>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label for="hotkeyScreenshotEnabled" id="hotkeyScreenshotLabel">📸 Ctrl+Shift+S — Скріншот</label>
+                        <span class="setting-hint">Зберегти скріншот для наступного звіту</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="hotkeyScreenshotEnabled" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label for="hotkeyAnalyzeEnabled" id="hotkeyAnalyzeLabel">⚡ Ctrl+Shift+A — Швидкий аналіз</label>
+                        <span class="setting-hint">Відкрити popup</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="hotkeyAnalyzeEnabled" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </section>
+
+            <section class="settings-section">
+                <h2>🤖 AI Токен</h2>
+                <p class="section-description">Встав ключ в один з інпутів — інший очиститься. Використовується той, що вставив.</p>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label for="geminiToken">Gemini</label>
+                        <span class="setting-hint"><a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></span>
+                    </div>
+                    <input type="password" id="geminiToken" class="text-input" placeholder="AIzaSy...">
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label for="openaiToken">OpenAI</label>
+                        <span class="setting-hint"><a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a></span>
+                    </div>
+                    <input type="password" id="openaiToken" class="text-input" placeholder="sk-...">
+                </div>
+            </section>
+
+            <section class="settings-section">
+                <h2>📋 AI Налаштування</h2>
+                <p class="section-description">Параметри генерації звітів</p>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label for="aiVerbosity">Деталізація звітів</label>
+                        <span class="setting-hint">Наскільки детальними мають бути AI звіти</span>
+                    </div>
+                    <select id="aiVerbosity" class="select-input">
+                        <option value="concise">Стисло</option>
+                        <option value="normal" selected>Нормально</option>
+                        <option value="detailed">Детально</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label for="aiLanguage">Мова звітів</label>
+                        <span class="setting-hint">На якій мові генерувати звіти</span>
+                    </div>
+                    <select id="aiLanguage" class="select-input">
+                        <option value="uk" selected>Українська</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </section>
+
+            <section class="settings-section">
+                <h2>⚡ Продуктивність</h2>
+                <p class="section-description">Оптимізація роботи extension</p>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label for="maxConsoleLogs">Максимум console logs</label>
+                        <span class="setting-hint">Скільки останніх логів зберігати</span>
+                    </div>
+                    <select id="maxConsoleLogs" class="select-input">
+                        <option value="50">50</option>
+                        <option value="100" selected>100</option>
+                        <option value="200">200</option>
+                        <option value="500">500</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label for="maxNetworkLogs">Максимум network logs</label>
+                        <span class="setting-hint">Скільки останніх запитів зберігати</span>
+                    </div>
+                    <select id="maxNetworkLogs" class="select-input">
+                        <option value="50">50</option>
+                        <option value="100" selected>100</option>
+                        <option value="200">200</option>
+                    </select>
+                </div>
+            </section>
+
+            <div class="save-section">
+                <button id="saveBtn" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span>Зберегти налаштування</span>
+                </button>
+                <button id="resetBtn" class="btn btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M1 4V10H7M23 20V14H17M20.49 9C19.9828 7.56678 19.1209 6.28536 17.9845 5.27542C16.8482 4.26548 15.4745 3.55976 13.9917 3.22426C12.5089 2.88877 10.9652 2.93434 9.50481 3.35677C8.04437 3.77921 6.71475 4.56471 5.64 5.64L1 10M23 14L18.36 18.36C17.2853 19.4353 15.9556 20.2208 14.4952 20.6432C13.0348 21.0657 11.4911 21.1112 10.0083 20.7757C8.52547 20.4402 7.1518 19.7345 6.01547 18.7246C4.87913 17.7147 4.01717 16.4332 3.51 15" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span>Скинути</span>
+                </button>
+            </div>
+
+            <div id="saveNotification" class="notification" style="display: none;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Налаштування збережено!</span>
+            </div>
+        </main>
+
+        <footer>
+            <small>AI Bug Reporter v1.0</small>
+        </footer>
+    </div>
+    
+    <script src="settings.js" type="module"></script>
+</body>
+</html>

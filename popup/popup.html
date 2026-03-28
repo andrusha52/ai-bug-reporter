@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Bug Reporter</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div id="draft-ready-modal" class="draft-ready-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="draft-ready-heading">
+        <div class="draft-ready-backdrop"></div>
+        <div class="draft-ready-card">
+            <h2 id="draft-ready-heading" class="draft-ready-heading">Готова Jira-чернетка</h2>
+            <p id="draft-ready-title" class="draft-ready-title"></p>
+            <p class="draft-ready-sub">Можна відкрити список у плагіні або пропустити — текст уже в «Історія».</p>
+            <div class="draft-ready-actions">
+                <button type="button" id="draftReadyOpenBtn" class="btn-draft-ready-primary">Відкрити плагін</button>
+                <button type="button" id="draftReadySkipBtn" class="btn-draft-ready-secondary">Пропустити</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="../icons/icon48.png" alt="" class="logo-img" width="32" height="32">
+                <div class="logo-text">
+                    <h1>AI Bug Reporter</h1>
+                    <span class="logo-tagline">Console · Network · Jira</span>
+                </div>
+            </div>
+            <button id="settingsBtn" class="icon-btn" title="Налаштування">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 1V3M12 21V23M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" stroke="currentColor" stroke-width="2"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Input Section -->
+        <section id="input-section" class="section">
+            <div id="incident-drafts-section" class="incident-drafts-section" style="display: none;" aria-live="polite">
+                <div class="incident-drafts-head">
+                    <h2 class="incident-drafts-title">Готові Jira-чернетки</h2>
+                    <p class="incident-drafts-hint">Після помилки в консолі або мережі AI готує тікет — відкрий пункт нижче, без ручного опису.</p>
+                </div>
+                <div id="incidentDraftsList" class="incident-drafts-list"></div>
+            </div>
+
+            <!-- Error Stats with Compact Severity Badges -->
+            <div id="errorStats" class="error-stats" style="display: none;">
+                <div class="severity-badges-compact">
+                    <!-- Critical -->
+                    <div class="severity-badge-compact critical" id="criticalBadge" style="display: none;">
+                        <span class="badge-icon">🔴</span>
+                        <span class="badge-count" id="criticalCount">0</span>
+                        <div class="badge-tooltip" id="criticalTooltip"></div>
+                    </div>
+                    
+                    <!-- High -->
+                    <div class="severity-badge-compact high" id="highBadge" style="display: none;">
+                        <span class="badge-icon">🟠</span>
+                        <span class="badge-count" id="highCount">0</span>
+                        <div class="badge-tooltip" id="highTooltip"></div>
+                    </div>
+                    
+                    <!-- Medium -->
+                    <div class="severity-badge-compact medium" id="mediumBadge" style="display: none;">
+                        <span class="badge-icon">🟡</span>
+                        <span class="badge-count" id="mediumCount">0</span>
+                        <div class="badge-tooltip" id="mediumTooltip"></div>
+                    </div>
+                    
+                    <!-- Low -->
+                    <div class="severity-badge-compact low" id="lowBadge" style="display: none;">
+                        <span class="badge-icon">💡</span>
+                        <span class="badge-count" id="lowCount">0</span>
+                        <div class="badge-tooltip" id="lowTooltip"></div>
+                    </div>
+                </div>
+                
+                <!-- Error Details Dropdown (collapsible) -->
+                <div class="error-details" id="errorDetails" style="display: none;">
+                    <button class="details-toggle" id="detailsToggle">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                            <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span>Деталі помилок</span>
+                    </button>
+                    <div class="details-content" id="detailsContent" style="display: none;">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <label for="bugDescription" class="manual-block-label">Або опиши вручну</label>
+            <div class="template-chips">
+                <button type="button" class="template-chip" data-text="Кнопка не реагує на клік">Кнопка не реагує</button>
+                <button type="button" class="template-chip" data-text="Помилка при відправці форми">Помилка форми</button>
+                <button type="button" class="template-chip" data-text="Білий екран / сторінка не завантажилась">Білий екран</button>
+                <button type="button" class="template-chip" data-text="404 або помилка завантаження даних">404 / помилка даних</button>
+                <button type="button" class="template-chip" data-text="Дані не відображаються коректно">Дані не відображаються</button>
+            </div>
+            <textarea 
+                id="bugDescription" 
+                placeholder="Що не працює? Або обери шаблон вище"
+                rows="3"
+            ></textarea>
+            <p class="input-hint">Enter — аналіз • Shift+Enter — новий рядок</p>
+            
+            <!-- Quick Action Chips -->
+            <div class="quick-actions">
+                <button class="quick-action-chip" data-mode="bug" title="Детальний bug report">
+                    🐛 Bug
+                </button>
+                <button class="quick-action-chip" data-mode="jira" title="Формат для Jira + скріншот">
+                    📋 Jira
+                </button>
+                <button class="quick-action-chip" data-mode="fix" title="Рекомендації як виправити">
+                    🔧 Fix
+                </button>
+                <button class="quick-action-chip" data-mode="qa" title="План тестування">
+                    ✅ QA
+                </button>
+                <button class="quick-action-chip" data-mode="quick" title="Швидкий summary">
+                    ⚡ Quick
+                </button>
+            </div>
+            
+            <div class="analyze-row">
+                <button id="analyzeBtn" class="btn btn-primary btn-compact">
+                    <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 3 3 6.13401 3 10C3 13.866 6.13401 17 10 17Z" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span class="btn-text">Аналізувати</span>
+                </button>
+            </div>
+            
+            <div id="error" class="error" style="display: none;"></div>
+        </section>
+
+        <!-- Loading Section -->
+        <section id="loading-section" class="section" style="display: none;">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Аналізую контекст і генерую звіт...</p>
+            </div>
+        </section>
+
+        <!-- Result Section -->
+        <section id="result-section" class="section" style="display: none;">
+            <div class="result-header sticky-actions">
+                <h2>Bug Report</h2>
+                <div class="result-actions">
+                    <button id="downloadScreenshotBtn" class="btn btn-secondary" style="display: none;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="2"/>
+                            <path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span>Скріншот</span>
+                    </button>
+                    <button id="copyBtn" class="btn btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <rect x="9" y="9" width="13" height="13" stroke="currentColor" stroke-width="2"/>
+                            <path d="M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span>Копіювати</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="bugReport" class="bug-report"></div>
+            
+            <div class="context-info">
+                <small id="contextInfo"></small>
+            </div>
+            
+            <div class="result-footer-actions result-footer-actions-stack">
+                <button type="button" id="backToHistoryBtn" class="btn btn-secondary" style="display: none;">
+                    ← До історії
+                </button>
+                <button id="newAnalysisBtn" class="btn btn-primary btn-outline">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span>Новий аналіз</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- History Section -->
+        <section id="history-section" class="section" style="display: none;">
+            <div class="history-header">
+                <h3>📜 Історія звітів</h3>
+                <button type="button" id="backFromHistoryBtn" class="icon-btn icon-btn-sm" title="Назад">←</button>
+            </div>
+            <div id="historyList" class="history-list">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings-section" class="section" style="display: none;">
+            <div class="settings-content">
+                <div class="settings-group">
+                    <h3>⚙️ Моніторинг</h3>
+                    
+                    <label class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Аналізуємо помилки в реальному часі</span>
+                            <span class="setting-hint">Автоматичний збір console та network помилок</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="monitoringEnabled" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                    
+                    <label class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Авто Jira після помилки</span>
+                            <span class="setting-hint">Окремий запит AI на кожен інцидент (консоль error / network fail). Вимкни, якщо хочеш лише ручний аналіз.</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="autoJiraDrafts" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+
+                <div class="settings-group">
+                    <h3>📋 Що потрапляє в звіт</h3>
+                    <p class="setting-hint" style="margin-bottom: 12px;">З поточної вкладки: <strong>консоль</strong> та <strong>мережа</strong> (помилки та невдалі запити). LocalStorage і cookies <strong>не читаються</strong> — лише кнопки «очистити» в швидких діях.</p>
+
+                    <label class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">📸 Скріншот сторінки</span>
+                            <span class="setting-hint">Опційно для UI-багів (Jira-режим завжди додає скрін)</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="includeScreenshot">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+
+                <div class="settings-group">
+                    <h3>⌨️ Гарячі клавіші</h3>
+                    <p class="setting-hint" style="margin-bottom: 12px;">Налаштуй гарячі клавіші — <a href="#" id="shortcutsLink">Натисни тут</a>. Якщо не працюють — можливо зайняті системою.</p>
+                    
+                    <label class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label" id="hotkeyScreenshotLabel">📸 Ctrl+Shift+S — Скріншот</span>
+                            <span class="setting-hint">Зберегти скріншот для наступного звіту</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="hotkeyScreenshotEnabled" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                    
+                    <label class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label" id="hotkeyAnalyzeLabel">⚡ Ctrl+Shift+A — Швидкий аналіз</span>
+                            <span class="setting-hint">Відкрити popup для аналізу</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="hotkeyAnalyzeEnabled" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+
+                <div class="settings-group">
+                    <h3>🤖 AI Токен</h3>
+                    <p class="setting-hint" style="margin-bottom: 12px;">Встав ключ в один з інпутів — інший очиститься. Використовується той, що вставив.</p>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Gemini</span>
+                            <span class="setting-hint"><a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></span>
+                        </div>
+                        <input type="password" id="geminiTokenInput" class="text-input" placeholder="AIzaSy...">
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">OpenAI</span>
+                            <span class="setting-hint"><a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a></span>
+                        </div>
+                        <input type="password" id="openaiTokenInput" class="text-input" placeholder="sk-...">
+                    </div>
+                    
+                    <button id="clearAiTokenBtn" class="btn-secondary" style="margin-top: 8px; width: 100%;">Очистити всі токени</button>
+                </div>
+
+                <div class="settings-group">
+                    <h3>🤖 AI Налаштування</h3>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Деталізація звітів</span>
+                        </div>
+                        <select id="aiVerbosity" class="select-input">
+                            <option value="concise">Стисло</option>
+                            <option value="normal" selected>Нормально</option>
+                            <option value="detailed">Детально</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Мова звітів</span>
+                        </div>
+                        <select id="aiLanguage" class="select-input">
+                            <option value="uk" selected>Українська</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="saveSettingsBtn" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span>Зберегти</span>
+                </button>
+
+                <button id="backFromSettingsBtn" class="btn btn-link">
+                    ← Назад
+                </button>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-row">
+                <a href="#" id="pageInfo" class="footer-link" title="Відкрити сторінку"></a>
+                <button type="button" id="historyBtn" class="footer-link btn-link-inline" title="Історія звітів">📜 Історія</button>
+            </div>
+        </footer>
+    </div>
+    
+    <script src="popup.js" type="module"></script>
+</body>
+</html>
