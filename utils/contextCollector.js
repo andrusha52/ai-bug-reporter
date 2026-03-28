@@ -31,7 +31,7 @@ export async function collectAdditionalContext(tabId, settings) {
         context.screenshot = null;
       }
     }
-    // Намисно НЕ читаємо localStorage / cookies для звіту — лише Quick Actions «очистити».
+    // Намисно НЕ читаємо localStorage / cookies для звіту.
   } catch (error) {
     console.error('[ContextCollector] Error:', error);
   }
