@@ -66,7 +66,15 @@ async function init() {
         chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
       });
     }
-    
+
+    const clearSiteDataBtn = document.getElementById('clearSiteDataBtn');
+    if (clearSiteDataBtn) {
+      clearSiteDataBtn.addEventListener('click', async () => {
+        const { runClearActiveTabSiteDataWithUi } = await import('../utils/clearSiteBrowsingData.js');
+        await runClearActiveTabSiteDataWithUi();
+      });
+    }
+
     console.log('[Settings] Initialized successfully');
   } catch (error) {
     console.error('[Settings] Initialization error:', error);

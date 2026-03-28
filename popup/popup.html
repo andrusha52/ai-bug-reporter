@@ -231,7 +231,15 @@
 
                 <div class="settings-group">
                     <h3>📋 Що потрапляє в звіт</h3>
-                    <p class="setting-hint" style="margin-bottom: 12px;">З поточної вкладки: <strong>консоль</strong> та <strong>мережа</strong> (помилки та невдалі запити). LocalStorage і cookies для звіту <strong>не зчитуються</strong>. Масове очищення даних сайту розширення не виконує — лише вручну в Chrome (налаштування сайту / DevTools), якщо треба відтворити баг «з чистого стану».</p>
+                    <p class="setting-hint" style="margin-bottom: 12px;">З поточної вкладки: <strong>консоль</strong> та <strong>мережа</strong> (помилки та невдалі запити). LocalStorage і cookies для звіту <strong>не зчитуються</strong>.</p>
+
+                    <label class="setting-item" style="flex-direction: column; align-items: stretch; gap: 8px;">
+                        <div class="setting-info">
+                            <span class="setting-label">Очистити дані поточного сайту</span>
+                            <span class="setting-hint">Опційно. Лише після твого підтвердження: cookies, кеш, localStorage, IndexedDB тощо <strong>тільки для відкритої вкладки</strong> (http/https). Зручно, якщо не хочеш копатися в DevTools.</span>
+                        </div>
+                        <button type="button" id="clearSiteDataBtn" class="btn-secondary" style="width: 100%;">Очистити дані цього сайту…</button>
+                    </label>
 
                     <label class="setting-item">
                         <div class="setting-info">

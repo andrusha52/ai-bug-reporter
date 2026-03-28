@@ -21,7 +21,15 @@
         <main>
             <section class="settings-section">
                 <h2>📋 Що потрапляє в звіт</h2>
-                <p class="section-description">З поточної вкладки: <strong>консоль</strong> та <strong>мережа</strong> (помилки). LocalStorage і cookies у звіт <strong>не зчитуються</strong>. Очищення cookies/кешу сайту розширення не робить — за потреби вручну в браузері.</p>
+                <p class="section-description">З поточної вкладки: <strong>консоль</strong> та <strong>мережа</strong> (помилки). LocalStorage і cookies у звіт <strong>не зчитуються</strong>.</p>
+
+                <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 12px;">
+                    <div class="setting-info">
+                        <span class="setting-label">Очистити дані поточного сайту</span>
+                        <span class="setting-hint">Лише після підтвердження: для вкладки, яка зараз активна у цьому вікні (http/https). Cookies, кеш, localStorage, IndexedDB тощо для цієї адреси — може розлогінити з сайту.</span>
+                    </div>
+                    <button type="button" id="clearSiteDataBtn" class="btn-secondary" style="width: 100%;">Очистити дані цього сайту…</button>
+                </div>
 
                 <div class="setting-item">
                     <div class="setting-info">

@@ -9,7 +9,8 @@
     "debugger",
     "tabs",
     "activeTab",
-    "notifications"
+    "notifications",
+    "browsingData"
   ],
   "host_permissions": [
     "<all_urls>",

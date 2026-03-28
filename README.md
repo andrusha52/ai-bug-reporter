@@ -11,6 +11,8 @@ A **Chrome extension** (Manifest V3) that helps you turn problems on the web int
 
 The extension does **not** include a bundled backend: API keys and history stay in **Chrome storage**; prompts go only to the provider you choose.
 
+**Optional:** a settings control lets you **clear stored site data** (cookies, cache, storage, etc.) for the **current tab’s origin only**, after explicit confirmation—useful for reproducing bugs without DevTools. It never runs automatically.
+
 ## Requirements
 
 - **Google Chrome** (or another Chromium browser that supports MV3 extensions).

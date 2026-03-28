@@ -99,6 +99,10 @@ async function init() {
     if (clearAiTokenBtn) {
       clearAiTokenBtn.addEventListener('click', handleClearAiToken);
     }
+    const clearSiteDataBtn = document.getElementById('clearSiteDataBtn');
+    if (clearSiteDataBtn) {
+      clearSiteDataBtn.addEventListener('click', handleClearSiteData);
+    }
     
     const geminiInput = document.getElementById('geminiTokenInput');
     const openaiInput = document.getElementById('openaiTokenInput');
@@ -1044,6 +1048,11 @@ async function handleTokenInput(provider, activeInput, otherInput) {
 /**
  * Clear all AI tokens
  */
+async function handleClearSiteData() {
+  const { runClearActiveTabSiteDataWithUi } = await import('../utils/clearSiteBrowsingData.js');
+  await runClearActiveTabSiteDataWithUi();
+}
+
 async function handleClearAiToken() {
   if (!confirm('Видалити всі AI токени? Аналіз не працюватиме без ключа.')) {
     return;
